@@ -10,10 +10,11 @@ import (
 )
 
 var commands = map[string]func(*rollbar.Client) int{
-	"get_item":            getItem,
-	"get_item_by_counter": getItemByCounter,
-	"get_occurrence":      getOccurrence,
-	"get_occurrences":     getOccurrences,
+	"get_item":             getItem,
+	"get_item_by_counter":  getItemByCounter,
+	"get_occurrence":       getOccurrence,
+	"get_item_occurrences": getItemOccurrences,
+	"get_occurrences":      getOccurrences,
 }
 
 func main() {
@@ -126,7 +127,8 @@ func getOccurrence(client *rollbar.Client) int {
 }
 
 func getOccurrences(client *rollbar.Client) int {
-	var page uint = 1
+	var page uint64 = 1
+	var err error
 
 	if len(os.Args) > 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s %s [<page>]\n", os.Args[0], os.Args[1])
@@ -134,15 +136,50 @@ func getOccurrences(client *rollbar.Client) int {
 	}
 
 	if len(os.Args) == 3 {
-		page_uint64, err := strconv.ParseUint(os.Args[2], 10, 0)
+		page, err = strconv.ParseUint(os.Args[2], 10, 0)
 		if err != nil {
 			fmt.Printf("%s\n", err)
 			return 1
 		}
-		page = uint(page_uint64)
 	}
 
 	response, err := client.GetOccurrencesWithPage(page)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		return 1
+	}
+	if response.IsError() {
+		fmt.Printf("Got error: %s\n", response.Message)
+		return 1
+	}
+	fmt.Printf("Got occurrences: %s\n", response.AsPrettyJSON())
+	return 0
+}
+
+func getItemOccurrences(client *rollbar.Client) int {
+	var page uint64 = 1
+	var err error
+
+	if len(os.Args) < 3 || len(os.Args) > 4 {
+		fmt.Fprintf(os.Stderr, "Usage: %s %s <item_id> [<page>]\n", os.Args[0], os.Args[1])
+		return 1
+	}
+
+	item_id, err := strconv.ParseUint(os.Args[2], 10, 0)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		return 1
+	}
+
+	if len(os.Args) == 4 {
+		page, err = strconv.ParseUint(os.Args[3], 10, 0)
+		if err != nil {
+			fmt.Printf("%s\n", err)
+			return 1
+		}
+	}
+
+	response, err := client.GetItemOccurrencesWithPage(item_id, page)
 	if err != nil {
 		fmt.Printf("%s\n", err)
 		return 1

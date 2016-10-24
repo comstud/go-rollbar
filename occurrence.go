@@ -70,7 +70,7 @@ type OccurrencesResult struct {
 type OccurrencesResponse struct {
 	rollbar *Client
 	BaseAPIResponse
-	Page               uint
+	Page               uint64
 	*OccurrencesResult `json:"result"`
 }
 
@@ -131,9 +131,24 @@ func (self *Client) GetOccurrence(id uint64) (*OccurrenceResponse, error) {
 }
 
 func (self *Client) getOccurrences(resp *OccurrencesResponse) (*OccurrencesResponse, error) {
-	query := url.Values{"page": []string{fmt.Sprintf("%d", resp.Page)}}
+	query := url.Values{
+		"page": []string{fmt.Sprintf("%d", resp.Page)},
+	}
 
 	err := self.httpGet("/instances", query, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (self *Client) getItemOccurrences(item_id uint64, resp *OccurrencesResponse) (*OccurrencesResponse, error) {
+	query := url.Values{
+		"page": []string{fmt.Sprintf("%d", resp.Page)},
+	}
+
+	err := self.httpGet(fmt.Sprintf("/item/%d/instances", item_id), query, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +164,7 @@ func (self *Client) GetOccurrences() (*OccurrencesResponse, error) {
 	return self.getOccurrences(resp)
 }
 
-func (self *Client) GetOccurrencesWithPage(page uint) (*OccurrencesResponse, error) {
+func (self *Client) GetOccurrencesWithPage(page uint64) (*OccurrencesResponse, error) {
 	if page == 0 {
 		return nil, errors.New("Page must be greater than 0")
 	}
@@ -158,4 +173,23 @@ func (self *Client) GetOccurrencesWithPage(page uint) (*OccurrencesResponse, err
 		Page:    page,
 	}
 	return self.getOccurrences(resp)
+}
+
+func (self *Client) GetItemOccurrences(item_id uint64) (*OccurrencesResponse, error) {
+	resp := &OccurrencesResponse{
+		rollbar: self,
+		Page:    1,
+	}
+	return self.getItemOccurrences(item_id, resp)
+}
+
+func (self *Client) GetItemOccurrencesWithPage(item_id uint64, page uint64) (*OccurrencesResponse, error) {
+	if page == 0 {
+		return nil, errors.New("Page must be greater than 0")
+	}
+	resp := &OccurrencesResponse{
+		rollbar: self,
+		Page:    page,
+	}
+	return self.getItemOccurrences(item_id, resp)
 }

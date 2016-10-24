@@ -3,6 +3,8 @@ package rollbar
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	net_url "net/url"
 )
@@ -52,6 +54,20 @@ func (self *Client) SetAPIBaseURL(base_url string) *Client {
 	return self
 }
 
+func (self *Client) decodeBody(http_resp *http.Response, resp interface{}) error {
+	if http_resp.StatusCode >= 200 && http_resp.StatusCode < 300 {
+		return json.NewDecoder(http_resp.Body).Decode(resp)
+	}
+
+	// Hrmph.
+	data, err := ioutil.ReadAll(http_resp.Body)
+	if err == nil {
+		return fmt.Errorf("Got code %d: %s\n", http_resp.StatusCode, string(data))
+	} else {
+		return fmt.Errorf("Got code %d: <Error reading body: %s>\n", http_resp.StatusCode, err)
+	}
+}
+
 func (self *Client) httpGet(url string, query net_url.Values, resp interface{}) error {
 	if query == nil {
 		query = make(net_url.Values)
@@ -70,6 +86,8 @@ func (self *Client) httpGet(url string, query net_url.Values, resp interface{}) 
 		url += "?" + query_str
 	}
 
+	//	log.Printf("Making query: %s", url)
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
@@ -83,7 +101,7 @@ func (self *Client) httpGet(url string, query net_url.Values, resp interface{}) 
 
 	defer http_resp.Body.Close()
 
-	return json.NewDecoder(http_resp.Body).Decode(resp)
+	return self.decodeBody(http_resp, resp)
 }
 
 func (self *Client) httpPatch(url string, data interface{}, resp interface{}) error {
@@ -120,7 +138,8 @@ func (self *Client) httpPatch(url string, data interface{}, resp interface{}) er
 	}
 
 	defer http_resp.Body.Close()
-	return json.NewDecoder(http_resp.Body).Decode(resp)
+
+	return self.decodeBody(http_resp, resp)
 }
 
 func NewClient(access_token string) (*Client, error) {
