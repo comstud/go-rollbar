@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Item struct
 type Item struct {
 	ID                      uint64   `json:"id"`
 	Project_id              uint64   `json:"project_id"`
@@ -30,23 +31,28 @@ type Item struct {
 	IntegrationsData interface{} `json:"integrations_data"`
 }
 
+// String representation in pretty JSON form
 func (self *Item) String() string {
 	return self.AsPrettyJSON()
 }
 
+// Item as json string
 func (self *Item) AsJSON() string {
 	return asJSON(self)
 }
 
+// Item as pretty json
 func (self *Item) AsPrettyJSON() string {
 	return asPrettyJSON(self)
 }
 
+// Container holding full response info for an item
 type ItemResponse struct {
 	BaseAPIResponse
 	*Item `json:"result"`
 }
 
+// Get a single item by its id (id is NOT the same as the counter)
 func (self *Client) GetItem(id uint64) (*ItemResponse, error) {
 	item_resp := &ItemResponse{}
 
@@ -63,6 +69,7 @@ func (self *Client) GetItem(id uint64) (*ItemResponse, error) {
 	return item_resp, nil
 }
 
+// Get a single item by its counter
 func (self *Client) GetItemByCounter(counter uint64) (*ItemResponse, error) {
 	item_resp := &ItemResponse{}
 
@@ -79,6 +86,7 @@ func (self *Client) GetItemByCounter(counter uint64) (*ItemResponse, error) {
 	return item_resp, nil
 }
 
+// Update an item's status by its id
 func (self *Client) SetItemStatus(id uint64, status string) error {
 	item_update := map[string]interface{}{
 		"status": status,
@@ -103,6 +111,7 @@ func (self *Client) SetItemStatus(id uint64, status string) error {
 	return nil
 }
 
+// Update an item's status by its counter
 func (self *Client) SetItemStatusByCounter(counter uint64, status string) error {
 	item_resp, err := self.GetItemByCounter(counter)
 	if err != nil || item_resp.Err != 0 {
