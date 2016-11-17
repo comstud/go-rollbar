@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/comstud/go-rollbar"
+	"github.com/comstud/go-rollbar/rollbar"
 )
 
 var commands = map[string]func(*rollbar.Client) int{
