@@ -9,24 +9,15 @@ import (
 	net_url "net/url"
 )
 
-const (
-	DEFAULT_API_BASE_URL         = "https://api.rollbar.com/api/1"
-	DEFAULT_NOTIFIER_NAME        = "go-rollbar"
-	DEFAULT_NOTIFIER_VERSION     = "0.0.1"
-	DEFAULT_NOTIFIER_ENVIRONMENT = "development"
-)
-
 // Client struct
 type Client struct {
-	apiBaseURL  string
-	accessToken string
-
+	httpClient      *http.Client
+	apiBaseURL      string
+	accessToken     string
 	notifierName    string
 	notifierVersion string
-	environment     string
-	codeVersion     string
 
-	httpClient *http.Client
+	ClientOptions
 }
 
 func (self *Client) decodeBody(http_resp *http.Response, resp interface{}) error {
@@ -103,28 +94,6 @@ func (self *Client) httpPost(url string, data interface{}, resp interface{}) err
 	return self.httpCall("POST", url, nil, data, resp)
 }
 
-// Get the environment
-func (self *Client) Environment() string {
-	return self.environment
-}
-
-// Set the environment
-func (self *Client) SetEnvironment(env string) *Client {
-	self.environment = env
-	return self
-}
-
-// Get the code version
-func (self *Client) CodeVersion() string {
-	return self.codeVersion
-}
-
-// Set the code version
-func (self *Client) SetCodeVersion(code_version string) *Client {
-	self.codeVersion = code_version
-	return self
-}
-
 // Get the base API URL
 func (self *Client) APIBaseURL() string {
 	return self.apiBaseURL
@@ -134,16 +103,4 @@ func (self *Client) APIBaseURL() string {
 func (self *Client) SetAPIBaseURL(base_url string) *Client {
 	self.apiBaseURL = base_url
 	return self
-}
-
-// Create a new client with specified access token
-func NewClient(access_token string) (*Client, error) {
-	return &Client{
-		apiBaseURL:      DEFAULT_API_BASE_URL,
-		accessToken:     access_token,
-		notifierName:    DEFAULT_NOTIFIER_NAME,
-		notifierVersion: DEFAULT_NOTIFIER_VERSION,
-		environment:     DEFAULT_NOTIFIER_ENVIRONMENT,
-		httpClient:      &http.Client{},
-	}, nil
 }
