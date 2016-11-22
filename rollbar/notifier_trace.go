@@ -158,11 +158,3 @@ func (self *NotifierTrace) AddRuntimeFrames(frames *runtime.Frames) error {
 
 	return nil
 }
-
-func (self *TraceNotification) Send() (*NotificationResponse, error) {
-	return self.client.sendNotification(self)
-}
-
-func (self *TraceChainNotification) Send() (*NotificationResponse, error) {
-	return self.client.sendNotification(self)
-}

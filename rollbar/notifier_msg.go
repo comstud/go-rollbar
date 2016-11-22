@@ -31,7 +31,3 @@ func (self *NotifierMessage) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(obj)
 }
-
-func (self *MessageNotification) Send() (*NotificationResponse, error) {
-	return self.client.sendNotification(self)
-}

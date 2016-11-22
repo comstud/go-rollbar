@@ -9,7 +9,7 @@ import (
 	"github.com/comstud/go-rollbar/rollbar"
 )
 
-var commands = map[string]func(*rollbar.Client) int{
+var commands = map[string]func(rollbar.Client) int{
 	"get_item":             getItem,
 	"get_item_by_counter":  getItemByCounter,
 	"get_occurrence":       getOccurrence,
@@ -52,7 +52,7 @@ func main() {
 	os.Exit(fn(client))
 }
 
-func getItem(client *rollbar.Client) int {
+func getItem(client rollbar.Client) int {
 	if len(os.Args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s %s <identifier>\n", os.Args[0], os.Args[1])
 		return 1
@@ -78,7 +78,7 @@ func getItem(client *rollbar.Client) int {
 	return 0
 }
 
-func getItemByCounter(client *rollbar.Client) int {
+func getItemByCounter(client rollbar.Client) int {
 	if len(os.Args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s %s <identifier>\n", os.Args[0], os.Args[1])
 		return 1
@@ -102,7 +102,7 @@ func getItemByCounter(client *rollbar.Client) int {
 	return 0
 }
 
-func getOccurrence(client *rollbar.Client) int {
+func getOccurrence(client rollbar.Client) int {
 	if len(os.Args) < 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s %s <identifier>\n", os.Args[0], os.Args[1])
 		return 1
@@ -126,7 +126,7 @@ func getOccurrence(client *rollbar.Client) int {
 	return 0
 }
 
-func getOccurrences(client *rollbar.Client) int {
+func getOccurrences(client rollbar.Client) int {
 	var page uint64 = 1
 	var err error
 
@@ -156,7 +156,7 @@ func getOccurrences(client *rollbar.Client) int {
 	return 0
 }
 
-func getItemOccurrences(client *rollbar.Client) int {
+func getItemOccurrences(client rollbar.Client) int {
 	var page uint64 = 1
 	var err error
 

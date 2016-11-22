@@ -9,8 +9,8 @@ import (
 	net_url "net/url"
 )
 
-// Client struct
-type Client struct {
+// client struct
+type client struct {
 	httpClient      *http.Client
 	apiBaseURL      string
 	accessToken     string
@@ -20,7 +20,7 @@ type Client struct {
 	ClientOptions
 }
 
-func (self *Client) decodeBody(http_resp *http.Response, resp interface{}) error {
+func (self *client) decodeBody(http_resp *http.Response, resp interface{}) error {
 	if http_resp.StatusCode >= 200 && http_resp.StatusCode < 300 {
 		return json.NewDecoder(http_resp.Body).Decode(resp)
 	}
@@ -34,7 +34,7 @@ func (self *Client) decodeBody(http_resp *http.Response, resp interface{}) error
 	}
 }
 
-func (self *Client) httpCall(method string, url string, query net_url.Values, data interface{}, resp interface{}) error {
+func (self *client) httpCall(method string, url string, query net_url.Values, data interface{}, resp interface{}) error {
 	if query == nil {
 		query = make(net_url.Values)
 	}
@@ -82,25 +82,30 @@ func (self *Client) httpCall(method string, url string, query net_url.Values, da
 
 }
 
-func (self *Client) httpGet(url string, query net_url.Values, resp interface{}) error {
+func (self *client) httpGet(url string, query net_url.Values, resp interface{}) error {
 	return self.httpCall("GET", url, query, nil, resp)
 }
 
-func (self *Client) httpPatch(url string, data interface{}, resp interface{}) error {
+func (self *client) httpPatch(url string, data interface{}, resp interface{}) error {
 	return self.httpCall("PATCH", url, nil, data, resp)
 }
 
-func (self *Client) httpPost(url string, data interface{}, resp interface{}) error {
+func (self *client) httpPost(url string, data interface{}, resp interface{}) error {
 	return self.httpCall("POST", url, nil, data, resp)
 }
 
+// Get the client options
+func (self *client) Options() *ClientOptions {
+	return &self.ClientOptions
+}
+
 // Get the base API URL
-func (self *Client) APIBaseURL() string {
+func (self *client) APIBaseURL() string {
 	return self.apiBaseURL
 }
 
 // Set the base API URL
-func (self *Client) SetAPIBaseURL(base_url string) *Client {
+func (self *client) SetAPIBaseURL(base_url string) Client {
 	self.apiBaseURL = base_url
 	return self
 }

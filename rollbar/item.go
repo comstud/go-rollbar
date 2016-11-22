@@ -53,7 +53,7 @@ type ItemResponse struct {
 }
 
 // Get a single item by its id (id is NOT the same as the counter)
-func (self *Client) GetItem(id uint64) (*ItemResponse, error) {
+func (self *client) GetItem(id uint64) (*ItemResponse, error) {
 	item_resp := &ItemResponse{}
 
 	err := self.httpGet(
@@ -70,7 +70,7 @@ func (self *Client) GetItem(id uint64) (*ItemResponse, error) {
 }
 
 // Get a single item by its counter
-func (self *Client) GetItemByCounter(counter uint64) (*ItemResponse, error) {
+func (self *client) GetItemByCounter(counter uint64) (*ItemResponse, error) {
 	item_resp := &ItemResponse{}
 
 	err := self.httpGet(
@@ -87,7 +87,7 @@ func (self *Client) GetItemByCounter(counter uint64) (*ItemResponse, error) {
 }
 
 // Update an item's status by its id
-func (self *Client) SetItemStatus(id uint64, status string) error {
+func (self *client) SetItemStatus(id uint64, status string) error {
 	item_update := map[string]interface{}{
 		"status": status,
 	}
@@ -112,7 +112,7 @@ func (self *Client) SetItemStatus(id uint64, status string) error {
 }
 
 // Update an item's status by its counter
-func (self *Client) SetItemStatusByCounter(counter uint64, status string) error {
+func (self *client) SetItemStatusByCounter(counter uint64, status string) error {
 	item_resp, err := self.GetItemByCounter(counter)
 	if err != nil || item_resp.Err != 0 {
 		if err == nil {

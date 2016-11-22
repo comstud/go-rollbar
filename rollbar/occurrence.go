@@ -75,7 +75,7 @@ type OccurrencesResult struct {
 
 // Full API response for multiple occurrences
 type OccurrencesResponse struct {
-	rollbar *Client
+	rollbar *client
 	BaseAPIResponse
 	Page               uint64
 	*OccurrencesResult `json:"result"`
@@ -127,7 +127,7 @@ func (self *OccurrencesResponse) GetNextPage() (*OccurrencesResponse, error) {
 	return self.rollbar.getOccurrences(resp)
 }
 
-func (self *Client) getOccurrences(resp *OccurrencesResponse) (*OccurrencesResponse, error) {
+func (self *client) getOccurrences(resp *OccurrencesResponse) (*OccurrencesResponse, error) {
 	query := url.Values{
 		"page": []string{fmt.Sprintf("%d", resp.Page)},
 	}
@@ -140,7 +140,7 @@ func (self *Client) getOccurrences(resp *OccurrencesResponse) (*OccurrencesRespo
 	return resp, nil
 }
 
-func (self *Client) getItemOccurrences(item_id uint64, resp *OccurrencesResponse) (*OccurrencesResponse, error) {
+func (self *client) getItemOccurrences(item_id uint64, resp *OccurrencesResponse) (*OccurrencesResponse, error) {
 	query := url.Values{
 		"page": []string{fmt.Sprintf("%d", resp.Page)},
 	}
@@ -154,7 +154,7 @@ func (self *Client) getItemOccurrences(item_id uint64, resp *OccurrencesResponse
 }
 
 // Get an occurrence by its id (id is NOT the same as the counter)
-func (self *Client) GetOccurrence(id uint64) (*OccurrenceResponse, error) {
+func (self *client) GetOccurrence(id uint64) (*OccurrenceResponse, error) {
 	occur_resp := &OccurrenceResponse{}
 
 	err := self.httpGet(
@@ -170,7 +170,7 @@ func (self *Client) GetOccurrence(id uint64) (*OccurrenceResponse, error) {
 }
 
 // Get first page of all occurrences
-func (self *Client) GetOccurrences() (*OccurrencesResponse, error) {
+func (self *client) GetOccurrences() (*OccurrencesResponse, error) {
 	resp := &OccurrencesResponse{
 		rollbar: self,
 		Page:    1,
@@ -179,7 +179,7 @@ func (self *Client) GetOccurrences() (*OccurrencesResponse, error) {
 }
 
 // Get a specific page of all occurrences
-func (self *Client) GetOccurrencesWithPage(page uint64) (*OccurrencesResponse, error) {
+func (self *client) GetOccurrencesWithPage(page uint64) (*OccurrencesResponse, error) {
 	if page == 0 {
 		return nil, errors.New("Page must be greater than 0")
 	}
@@ -191,7 +191,7 @@ func (self *Client) GetOccurrencesWithPage(page uint64) (*OccurrencesResponse, e
 }
 
 // Get first page of occurrences for an item (by item id -- NOT the counter)
-func (self *Client) GetItemOccurrences(item_id uint64) (*OccurrencesResponse, error) {
+func (self *client) GetItemOccurrences(item_id uint64) (*OccurrencesResponse, error) {
 	resp := &OccurrencesResponse{
 		rollbar: self,
 		Page:    1,
@@ -200,7 +200,7 @@ func (self *Client) GetItemOccurrences(item_id uint64) (*OccurrencesResponse, er
 }
 
 // Get a specific page of occurrences for an item (by item id -- NOT the counter)
-func (self *Client) GetItemOccurrencesWithPage(item_id uint64, page uint64) (*OccurrencesResponse, error) {
+func (self *client) GetItemOccurrencesWithPage(item_id uint64, page uint64) (*OccurrencesResponse, error) {
 	if page == 0 {
 		return nil, errors.New("Page must be greater than 0")
 	}

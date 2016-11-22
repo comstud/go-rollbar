@@ -4,16 +4,13 @@ import "encoding/json"
 
 // base notifcation object to post as 'data'. This base
 type baseNotification struct {
-	// Pointer back to client
-	client *Client `json:"-"`
-
 	// Required
 
 	Environment string `json:"environment"`
 
 	// Optional
 
-	Level       notificationLevel `json:"level,omitempty"`
+	Level       NotificationLevel `json:"level,omitempty"`
 	Timestamp   int64             `json:"timestamp,omitempty"`
 	CodeVersion string            `json:"code_verison,omitempty"`
 	Platform    string            `json:"platform,omitempty"`
@@ -38,6 +35,14 @@ type baseNotification struct {
 
 	// Optional info that describes the library used to send event
 	Notifier *NotifierLibrary `json:"notifier,omitempty"`
+}
+
+func (self *baseNotification) GetEnvironment() string {
+	return self.Environment
+}
+
+func (self *baseNotification) GetLevel() NotificationLevel {
+	return self.Level
 }
 
 // Optional data about client making the request

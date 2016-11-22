@@ -2,20 +2,21 @@ package rollbar
 
 import "time"
 
-type notificationLevel string
+type NotificationLevel string
 
 const (
-	LV_CRITICAL notificationLevel = notificationLevel("critical")
-	LV_ERROR    notificationLevel = notificationLevel("error")
-	LV_WARNING  notificationLevel = notificationLevel("warning")
-	LV_INFO     notificationLevel = notificationLevel("info")
-	LV_DEBUG    notificationLevel = notificationLevel("debug")
+	LV_CRITICAL NotificationLevel = NotificationLevel("critical")
+	LV_ERROR    NotificationLevel = NotificationLevel("error")
+	LV_WARNING  NotificationLevel = NotificationLevel("warning")
+	LV_INFO     NotificationLevel = NotificationLevel("info")
+	LV_DEBUG    NotificationLevel = NotificationLevel("debug")
 )
 
 type CustomInfo map[string]interface{}
 
 type Notification interface {
-	Send() (*NotificationResponse, error)
+	GetEnvironment() string
+	GetLevel() NotificationLevel
 }
 
 // NotificationResponse contains the API response for posting an item
@@ -26,24 +27,7 @@ type NotificationResponse struct {
 	} `json:"result"`
 }
 
-func (self *Client) sendNotification(notif interface{}) (*NotificationResponse, error) {
-	notif_resp := &NotificationResponse{}
-	err := self.httpPost(
-		"/item/",
-		map[string]interface{}{
-			"access_token": self.accessToken,
-			"data":         notif,
-		},
-		&notif_resp,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return notif_resp, nil
-}
-
-func (self *Client) fillBaseNotification(base *baseNotification, level notificationLevel, title string, custom CustomInfo) {
-	base.client = self
+func (self *client) fillBaseNotification(base *baseNotification, level NotificationLevel, title string, custom CustomInfo) {
 	base.Environment = self.Environment
 	base.Level = level
 	base.Title = title
@@ -62,7 +46,7 @@ func (self *Client) fillBaseNotification(base *baseNotification, level notificat
 	}
 }
 
-func (self *Client) NewMessageNotification(level notificationLevel, message string, custom CustomInfo) *MessageNotification {
+func (self *client) NewMessageNotification(level NotificationLevel, message string, custom CustomInfo) *MessageNotification {
 	notif := &MessageNotification{}
 	self.fillBaseNotification(&notif.baseNotification, level, message, custom)
 	notif.notifierMessageBody.Message.Body = message
@@ -70,23 +54,39 @@ func (self *Client) NewMessageNotification(level notificationLevel, message stri
 	return notif
 }
 
-func (self *Client) NewTraceNotification(level notificationLevel, message string, custom CustomInfo) *TraceNotification {
+func (self *client) NewTraceNotification(level NotificationLevel, message string, custom CustomInfo) *TraceNotification {
 	notif := &TraceNotification{}
 
 	self.fillBaseNotification(&notif.baseNotification, level, message, custom)
 	return notif
 }
 
-func (self *Client) NewTraceChainNotification(level notificationLevel, message string, custom CustomInfo) *TraceChainNotification {
+func (self *client) NewTraceChainNotification(level NotificationLevel, message string, custom CustomInfo) *TraceChainNotification {
 	notif := &TraceChainNotification{}
 
 	self.fillBaseNotification(&notif.baseNotification, level, message, custom)
 	return notif
 }
 
-func (self *Client) NewCrashReportNotification(level notificationLevel, message string, custom CustomInfo) *CrashReportNotification {
+func (self *client) NewCrashReportNotification(level NotificationLevel, message string, custom CustomInfo) *CrashReportNotification {
 	notif := &CrashReportNotification{}
 
 	self.fillBaseNotification(&notif.baseNotification, level, message, custom)
 	return notif
+}
+
+func (self *client) SendNotification(notif Notification) (*NotificationResponse, error) {
+	notif_resp := &NotificationResponse{}
+	err := self.httpPost(
+		"/item/",
+		map[string]interface{}{
+			"access_token": self.accessToken,
+			"data":         notif,
+		},
+		&notif_resp,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return notif_resp, nil
 }
