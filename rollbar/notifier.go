@@ -15,6 +15,7 @@ const (
 type CustomInfo map[string]interface{}
 
 type Notification interface {
+	Send() (*NotificationResponse, error)
 }
 
 // NotificationResponse contains the API response for posting an item
