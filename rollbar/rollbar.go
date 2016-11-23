@@ -79,6 +79,6 @@ func NewClient(access_token string) (Client, error) {
 	}, nil
 }
 
-func NewNOOPClient() (Client, error) {
-	return &noopClient{}, nil
+func NewNOOPClient() Client {
+	return &noopClient{}
 }
