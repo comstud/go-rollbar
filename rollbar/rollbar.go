@@ -78,3 +78,7 @@ func NewClient(access_token string) (Client, error) {
 		ClientOptions:   DefaultClientOptions,
 	}, nil
 }
+
+func NewNOOPClient() (Client, error) {
+	return &noopClient{}, nil
+}
